@@ -7,6 +7,7 @@
 <!-- 	변수설정 -->
 	<typeAliases>
 		<typeAlias type="com.daea.dtos.EquiDto" alias="Equidto"/>
+		<typeAlias type="com.daea.dtos.UserDto" alias="Userdto"/>
 	</typeAliases>
 	
 <!-- 	DB접속 정보 셋팅 -->
@@ -24,6 +25,7 @@
 	
 	<mappers>
 		<mapper resource="sql/DaeaMapper.xml"/>
+		<mapper resource="sql/UserMapper.xml"/>
 	</mappers>
 </configuration>
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.daea.user">
+
+    <insert id="insertUser" parameterType="com.daea.dtos.UserDto">
+        INSERT INTO USERINFO (userid, username, userpassword, userrole, userreqdate)
+        VALUES (#{userid}, #{username}, #{userpassword}, #{userrole}, SYSDATE() )
+    </insert>
+
+    <select id="idCheck" parameterType="String" resultType="String">
+        SELECT userid FROM userinfo WHERE userid = #{id}
+    </select>
+
+</mapper>

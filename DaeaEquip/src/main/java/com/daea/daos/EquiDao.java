@@ -12,7 +12,7 @@ import com.daea.dtos.EquiDto;
 
 public class EquiDao extends SqlMapConfig {
 	
-	private String namespace = "com.daea.";
+	private String namespace = "com.daea.equi.";
 	
 	// 장비 입력
 	public boolean insertData(EquiDto dto) {
