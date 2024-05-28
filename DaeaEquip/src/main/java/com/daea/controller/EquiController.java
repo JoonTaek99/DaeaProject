@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import com.daea.daos.EquiDao;
 import com.daea.dtos.EquiDto;
+import com.daea.util.Paging;
 
 
 @WebServlet("*.board")
@@ -34,8 +36,24 @@ public class EquiController extends HttpServlet {
 		HttpSession session = request.getSession();
 		
 		if (command.equals("/boardList.board")) {
-			List<EquiDto> list = dao.getAllData();
+			String pnum=request.getParameter("pnum");
+			System.out.println("pnum : "+ pnum);
+			if(pnum==null) {
+				pnum=(String)session.getAttribute("pnum");//현재 조회중인 페이지번호
+			}else {
+				//새로 페이지를 요청할 경우 세션에 저장
+				session.setAttribute("pnum", pnum);
+			}
+			
+			List<EquiDto> list = dao.getAllData(pnum);
 			request.setAttribute("list", list);
+			
+			int pcount=dao.getPCount();
+			request.setAttribute("pcount", pcount);
+			
+			Map<String, Integer> map=Paging.pagingValue(pcount, pnum, 5);
+			request.setAttribute("pMap", map);
+			
 			dispatch("board/boardList.jsp", request, response);
 		} else if (command.equals("/insertDataForm.board")) {
 			dispatch("board/insertDataForm.jsp", request, response);
@@ -142,13 +160,30 @@ public class EquiController extends HttpServlet {
 				dispatch("board/insertDataForm.jsp", request, response);
 			}
 		} else if (command.equals("/searchData.board")) {
-			System.out.println("검색 실행");
-			String keyword = request.getParameter("keyword");
-			System.out.println("전달받은 keyword" + keyword);
-			List<EquiDto> list = dao.searchData(keyword);
-			request.setAttribute("list", list);
-			System.out.println("검색된 리스트"+list);
-			dispatch("board/boardList.jsp", request, response);
+		    System.out.println("검색 실행");
+		    String keyword = request.getParameter("keyword");
+		    System.out.println("전달받은 keyword: " + keyword);
+		    
+		    String pnum = request.getParameter("pnum");
+		    if (pnum == null) {
+		        pnum = (String) session.getAttribute("pnum"); // 현재 조회중인 페이지번호
+		    } else {
+		        // 새로 페이지를 요청할 경우 세션에 저장
+		        session.setAttribute("pnum", pnum);
+		    }
+		    
+		    List<EquiDto> list = dao.searchData(keyword, pnum);
+		    request.setAttribute("list", list);
+		    
+		    System.out.println("검색된 리스트: " + list);
+		    
+		    int pcount = dao.getPCount();
+		    request.setAttribute("pcount", pcount);
+		    
+		    Map<String, Integer> map = Paging.pagingValue(pcount, pnum, 5);
+		    request.setAttribute("pMap", map);
+		    
+		    dispatch("board/boardList.jsp", request, response);
 		} else if (command.equals("/detailData.board")) {
             String assetNumber = request.getParameter("assetNumber");
             System.out.println(assetNumber);
