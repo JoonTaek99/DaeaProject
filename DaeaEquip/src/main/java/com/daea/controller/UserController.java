@@ -13,54 +13,53 @@ import com.daea.dtos.UserDto;
 
 @WebServlet("*.user")
 public class UserController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doPost(request, response);
-	}
+    private static final long serialVersionUID = 1L;
 
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String requestURI=request.getRequestURI();
-		String contextPath=request.getContextPath();
-		
-		String command=requestURI.substring(contextPath.length());
-		System.out.println("command값:"+command);
-		
-		HttpSession session = request.getSession();
-		UserDao dao = UserDao.getUserDao();
-		
-		if(command.equals("/registForm.user")) {
-			dispatch("user/registForm.jsp", request, response);
-		} else if(command.equals("/idCheck.user")) {
-			String id = request.getParameter("id");
-			String resultID = dao.idCheck(id);
-			
-			response.setContentType("text/plain");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(resultID == null ? "null" : resultID);
-		} else if(command.equals("/insertUser.user")) {
-			UserDto dto = new UserDto();
-			dto.setId(request.getParameter("id"));
-			dto.setName(request.getParameter("name"));
-			dto.setPassword(request.getParameter("password"));
-			
-			boolean isS = dao.insertUser(dto);
-			if(isS) {
-				dispatch("index.jsp", request, response);
-			} else {
-				dispatch("user/registForm.jsp", request, response);
-			}
-		}
-	
-	
-	
-	}
-	
-	public void dispatch(String url, HttpServletRequest request, 
-			 HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher(url).forward(request, response);
-	}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String command = requestURI.substring(contextPath.length());
+        System.out.println("command값:" + command);
+
+        HttpSession session = request.getSession();
+        UserDao dao = UserDao.getUserDao();
+
+        switch (command) {
+            case "/registForm.user":
+                dispatch("user/registForm.jsp", request, response);
+                break;
+            case "/idCheck.user":
+                String id = request.getParameter("id");
+                String resultID = dao.idCheck(id);
+                
+                response.setContentType("text/plain");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(resultID == null ? "null" : resultID);
+                break;
+            case "/insertUser.user":
+                UserDto dto = new UserDto();
+                dto.setId(request.getParameter("id"));
+                dto.setName(request.getParameter("name"));
+                dto.setPassword(request.getParameter("password"));
+
+                boolean isS = dao.insertUser(dto);
+                if (isS) {
+                    dispatch("index.jsp", request, response);
+                } else {
+                    dispatch("user/registForm.jsp", request, response);
+                }
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                break;
+        }
+    }
+
+    private void dispatch(String url, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher(url).forward(request, response);
+    }
 }
